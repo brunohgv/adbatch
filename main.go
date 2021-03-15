@@ -2,12 +2,10 @@ package main
 
 import (
 	"strings"
-	"fmt"
 	"os"
-	"path/filepath"
+	"sync"
 	"github.com/brunohgv/adbatch/adb"
-	"github.com/brunohgv/adbatch/utils"
-	"github.com/brunohgv/adbatch/files"
+	"github.com/brunohgv/adbatch/runner"
 )
 
 func main() {
@@ -16,17 +14,25 @@ func main() {
 	command := strings.Join(arguments, " ")
 
 	deviceIds := adb.GetDevices()
-	currentDir, err := os.Getwd()
+	outputDir, err := os.Getwd()
 	if err != nil {
 		panic("Could not locate the current directory")
 	}
 
+	var wg sync.WaitGroup
 	for _, deviceId := range deviceIds {
-		out, _ := utils.ExecuteCommand(fmt.Sprintf("adb -s %s %s", deviceId, command))
-		fmt.Printf("Output for %v:\n\n", deviceId)
-		fmt.Println(out)
-		filePath := filepath.Join(currentDir, fmt.Sprintf("%v-out.txt", deviceId))
-		files.WriteFile(filePath, out)
-		fmt.Println("================================================")
+		wg.Add(1)
+
+		go func(deviceId string) {
+			defer wg.Done()
+			process := runner.Process{
+				Command:	command,
+				DeviceId:	deviceId,
+				FilePath:	outputDir,
+			}
+			process.Run()
+		}(deviceId)
 	}
+
+	wg.Wait()
 }
