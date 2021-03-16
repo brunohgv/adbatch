@@ -1,0 +1,16 @@
+name: adbatch
+version: git
+summary: Execute adb commands to all connected devices easily
+description: |
+  The adbatch is a simple way to execute adb commands to all connected devices
+confinement: devmode
+base: core18
+parts:
+  adbatch:
+    plugin: go
+    go-importpath: https://github.com/brunohgv/adbatch
+    source: .
+    source-type: git
+apps:
+  adbatch:
+    command: bin/adbatch
