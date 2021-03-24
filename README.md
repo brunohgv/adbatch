@@ -56,7 +56,7 @@ Download the compressed file containing your OS
 
 Extract the content of the compressed file
 
-Add the path to the compressed file to your **path variables**
+Add the path to the extracted file to your **path variables**
 
 To test you can open the terminal and type
 ```bash
